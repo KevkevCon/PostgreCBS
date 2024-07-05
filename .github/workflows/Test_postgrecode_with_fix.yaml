@@ -5,7 +5,7 @@ run-name: pushed script from ${{ github.actor}} is being tested and errors fixed
 
 on: 
     push:
-      - Development
+    
  
             
 
