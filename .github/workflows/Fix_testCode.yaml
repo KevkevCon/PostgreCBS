@@ -1,0 +1,30 @@
+name: Fix_testCode
+
+run-name: pushed code from ${{github.actor}} is being fixed  
+
+on:
+    workflow_run:
+        workflows: ["Test_postgrecode"]
+        types:
+            - completed
+
+
+jobs:
+    Try_to_fix_issues:
+        if: ${{ github.event.workflow_run.conclusion == 'failure'}}
+        runs-on: windows-latest
+
+        steps:
+        
+            - uses: actions/checkout@v2
+
+            - name: Setup py
+              uses: actions/setup-python@v2
+
+            - name: install sqlfluf for fixing
+              run: pip install sqlfluff
+
+            - name: run sqlfluff fix command
+              run: sqlfluff fix DDL/* --dialect postgres
+
+              continue-on-error: true
