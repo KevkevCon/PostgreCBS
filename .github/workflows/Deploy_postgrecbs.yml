@@ -29,5 +29,5 @@ jobs:
                 PGDATABASE: ${{ secrets.CBS_DBNAME}}
               run: |
                 $env:PGPASSWORD = "${{ secrets.CBS_WW}}"
-                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $_..."
+                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $_Fullname..."
                   psql -h $env:CBS_HOSTN -p $env:CBS_PORT -d $env:CBS_DBNAME -f &_.Fullname}
