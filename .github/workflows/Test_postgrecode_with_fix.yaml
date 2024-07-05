@@ -33,7 +33,7 @@ jobs:
     Try_to_fix_issues:
       runs-on: windows-latest
       needs: Test_Code
-      if: ${{ needs.Test_Code.result == 'completed' }}       
+      if: ${{ failure() }}       
       steps:
       - uses: actions/checkout@v2
     
