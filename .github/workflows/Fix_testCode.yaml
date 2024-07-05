@@ -11,7 +11,7 @@ on:
 
 jobs:
     Try_to_fix_issues:
-        if: ${{ github.event.workflow_run.conclusion == 'failure'}}
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         runs-on: windows-latest
 
         steps:
