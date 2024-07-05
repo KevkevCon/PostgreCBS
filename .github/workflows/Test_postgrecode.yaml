@@ -27,7 +27,7 @@ jobs:
               run: pip install sqlfluff
 
             - name: run sql fluff
-              run: sqlfluff lint DDL/* --dialect PostgreSQL
+              run: sqlfluff lint DDL/* --dialect postgres
 
 
                 
