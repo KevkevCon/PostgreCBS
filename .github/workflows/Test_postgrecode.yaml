@@ -1,0 +1,33 @@
+name: Test_postgrecode
+
+
+run-name: ${{ github.actor}}''s pushed code is testing'
+
+on: 
+    push:
+ 
+            
+
+    workflow_dispatch:
+    # Deze workflow is reusable in de toekomst
+    workflow_call:
+jobs:
+    Test_Code:
+        runs-on: windows-latest
+        
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: set up pythion in vm
+              uses: actions/setup-python@v2
+              with:
+                 python-version: '3.9'
+            
+            - name: Install sqlFluff 
+              run: pip install sqlfluff
+
+            - name: run sql fluff
+              run: sqlfluff lint DDL/* --dialect PostgreSQL
+
+
+                
