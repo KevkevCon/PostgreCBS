@@ -1,0 +1,34 @@
+name: Deploy to postgreServer
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    Deploy_to_postgre:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: install postgre sql client on runner
+              run: choco install postgresql --yes
+
+            - name: add postgre to path
+              run: |
+               setx path "%path%;C:\Program Files\PostgreSQL\13\bin"refreshenv
+
+            - name: Run SQL scripts
+              env: 
+                PGHOST: ${{ secrets.CBS_HOSTN}}
+                PGPORT: ${{ secrets.CBS_PORT}}
+                PGUSER: ${{ secrets.CBS_USERNAME}}
+                PGPASSWORD: ${{ secrets.CBS_WW}}
+                PGDATABASE: ${{ secrets.CBS_DBNAME}}
+              run: |
+                $env: PGPASSWORD = "${{ secrets.CBS_WW}}"
+                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $_..."
+                  psql -h $env:CBS_HOSTN -p $env: CBS_PORT -d $env: CBS_DBNAME -f &_.Fullname}
+
+             
