@@ -31,20 +31,20 @@ jobs:
 
 
     Try_to_fix_issues:
-            
-        runs-on: windows-latest
-        needs: Test_Code
-        if: ${{ needs.Test_Code.result == 'failure' }}      
-        steps:
-                
-          - uses: actions/checkout@v2
-        
-          - name: Setup py
-            uses: actions/setup-python@v2
-          - name: install sqlfluf for fixing
-            run: pip install sqlfluff
-        
-          - name: run sqlfluff fix command
-            run: sqlfluff fix DDL/* --dialect postgres
-        
-            continue-on-error: true            
+      runs-on: windows-latest
+      needs: Test_Code
+      if: ${{ needs.Test_Code.result == 'failure' }}       
+      steps:
+      - uses: actions/checkout@v2
+    
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: Install sqlfluff
+        run: pip install sqlfluff
+    
+      - name: Run sqlfluff fix command
+        run: sqlfluff fix DDL/* --dialect postgres
+        continue-on-error: true       
