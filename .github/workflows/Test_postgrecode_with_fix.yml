@@ -59,7 +59,7 @@ jobs:
          git config --global user.name "${{secrets.GITUSER}}"
          git add DDL/*
          git commit -m "Added automacit fix from ${{ github.actor}}"
-         git push
+         git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:Development
 
 
 
