@@ -18,16 +18,17 @@ jobs:
             - name: add postgre to path
               shell: cmd
               run: |
-               setx path "%path%;C:\Program Files\PostgreSQL\13\bin"refreshenv
+               setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
+               refreshenv
 
             - name: Run SQL scripts
               env: 
-                PGHOST: ${{ secrets.CBS_HOSTN}}
-                PGPORT: ${{ secrets.CBS_PORT}}
-                PGUSER: ${{ secrets.CBS_USERNAME}}
-                PGPASSWORD: ${{ secrets.CBS_WW}}
-                PGDATABASE: ${{ secrets.CBS_DBNAME}}
+                PGHOST: ${{ secrets.CBS_HOSTN }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
               run: |
-                $env:PGPASSWORD = "${{ secrets.CBS_WW}}"
-                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $($_Fullname)..."
-                  psql -h $env:CBS_HOSTN -p $env:CBS_PORT -d $env:CBS_DBNAME -f &_.Fullname}
+                $env:PGPASSWORD = "${{ secrets.CBS_WW }}"
+                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $($_.Fullname)..."
+                  psql -h $env:PGHOST -p $env:PGPORT -d $env:PGDATABASE -f &_.Fullname}
