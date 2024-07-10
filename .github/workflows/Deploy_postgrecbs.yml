@@ -15,12 +15,20 @@ jobs:
       - name: Install PostgreSQL client on runner
         run: choco install postgresql --yes
 
+      - name: Verify PostgreSQL installation directory
+        shell: cmd
+        run: dir "C:\Program Files\PostgreSQL"
+
       - name: Add PostgreSQL to path
         shell: cmd
         run: |
           setx path "%path%;C:\Program Files\PostgreSQL\16\bin"
           refreshenv
           echo %path%
+
+      - name: Verify PostgreSQL in path
+        shell: cmd
+        run: where psql
 
       - name: Verify PostgreSQL installation
         shell: pwsh
