@@ -38,7 +38,8 @@ jobs:
       needs: Test_Code
       if: ${{ failure() }}       
       steps:
-      - uses: actions/checkout@v2
+      - name: donwload to vm
+        uses: actions/checkout@v2
     
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -57,7 +58,7 @@ jobs:
          git config --global user.email "${{secrets.GITEMAIL}}"
          git config --global user.name "${{secrets.GITUSER}}"
          git add DDL/*
-         git commit -m "Added fix from ${{ github.actor}}"
+         git commit -m "Added automacit fix from ${{ github.actor}}"
          git push
 
 

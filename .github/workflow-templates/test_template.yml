@@ -1,0 +1,20 @@
+name: Test_template
+
+on: 
+    push:
+      branches:
+          [ $default-branch ] 
+
+    workflow_dispatch:
+
+jobs:
+    Test_Code:
+        runs-on: windows-latest
+        
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: set up pythion in vm
+              uses: actions/setup-python@v2
+              with:
+                 python-version: '3.9'
