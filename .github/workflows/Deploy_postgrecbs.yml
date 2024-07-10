@@ -57,10 +57,15 @@ jobs:
           setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
           refreshenv
 
-      - name: Debugging Output
+      - name: Verify PostgreSQL installation
         shell: pwsh
         run: |
-          Write-Output "Path variable: $env:Path"
+          if (Get-Command psql -ErrorAction SilentlyContinue) {
+            Write-Output "psql is available."
+          } else {
+            Write-Output "psql is not available."
+            exit 1
+          }
 
       - name: Run SQL scripts
         env: 
