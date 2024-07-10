@@ -18,7 +18,7 @@ jobs:
       - name: Add PostgreSQL to path
         shell: cmd
         run: |
-          setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
+          setx path "%path%;C:\Program Files\PostgreSQL\16\bin"
           refreshenv
           echo %path%
 
