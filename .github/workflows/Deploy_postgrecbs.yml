@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: Deploy to PostgreServer
 
 on:
@@ -51,3 +52,39 @@ jobs:
             Write-Output "Running $($file.FullName)..."
             psql -h $env:PGHOST -p $env:PGPORT -U $env:PGUSER -d $env:PGDATABASE -f $file.FullName
           }
+=======
+name: Deploy to postgreServer
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    Deploy_to_postgre:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: install postgre sql client on runner
+              run: choco install postgresql --yes
+
+            - name: add postgre to path
+              shell: cmd
+              run: |
+               setx path "%path%;C:\Program Files\PostgreSQL\16\bin"
+               refreshenv
+
+            - name: Run SQL scripts
+              env: 
+                PGHOST: ${{ secrets.CBS_HOSTN }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
+              run: |
+                $env:PGPASSWORD = "${{ secrets.CBS_WW }}"
+                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $($_.FullName)..."
+                  psql -h $env:PGHOST -p $env:PGPORT -d $env:PGDATABASE -f &_.FullName}
+>>>>>>> 4e807c57af5b8f6179c15ae8528288a440f62245
