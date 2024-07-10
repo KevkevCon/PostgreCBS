@@ -1,0 +1,9 @@
+{
+    "name": "Main template ",
+    "description":"Dit is de standaarde template voor een worklow met een windows runner die python installer als eerste job de repo te copieren ",
+    "iconName": "Play"
+
+
+
+
+}
