@@ -1,34 +1,83 @@
-name: Deploy to postgreServer
+# name: Deploy to postgreServer
+
+# on:
+#     push:
+#         branches:
+#             - main
+#     workflow_dispatch:
+
+# jobs:
+#     Deploy_to_postgre:
+#         runs-on: windows-latest
+#         steps:
+#             - uses: actions/checkout@v2
+
+#             - name: install postgre sql client on runner
+#               run: choco install postgresql --yes
+
+#             - name: add postgre to path
+#               shell: cmd
+#               run: |
+#                setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
+#                refreshenv
+
+#             - name: Run SQL scripts
+#               env: 
+#                 PGHOST: ${{ secrets.CBS_HOSTN }}
+#                 PGPORT: ${{ secrets.CBS_PORT }}
+#                 PGUSER: ${{ secrets.CBS_USERNAME }}
+#                 PGPASSWORD: ${{ secrets.CBS_WW }}
+#                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
+#               run: |
+#                 $env:PGPASSWORD = "${{ secrets.CBS_WW }}"
+#                 Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $($_.FullName)..."
+#                   psql -h $env:PGHOST -p $env:PGPORT -d $env:PGDATABASE -f &_.FullName}
+
+
+name: Deploy to PostgreServer
 
 on:
-    push:
-        branches:
-            - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-    Deploy_to_postgre:
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v2
+  Deploy_to_postgre:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
 
-            - name: install postgre sql client on runner
-              run: choco install postgresql --yes
+      - name: Install PostgreSQL client on runner
+        run: choco install postgresql --yes
 
-            - name: add postgre to path
-              shell: cmd
-              run: |
-               setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
-               refreshenv
+      - name: Add PostgreSQL to path
+        shell: cmd
+        run: |
+          setx path "%path%;C:\Program Files\PostgreSQL\13\bin"
+          refreshenv
 
-            - name: Run SQL scripts
-              env: 
-                PGHOST: ${{ secrets.CBS_HOSTN }}
-                PGPORT: ${{ secrets.CBS_PORT }}
-                PGUSER: ${{ secrets.CBS_USERNAME }}
-                PGPASSWORD: ${{ secrets.CBS_WW }}
-                PGDATABASE: ${{ secrets.CBS_DBNAME }}
-              run: |
-                $env:PGPASSWORD = "${{ secrets.CBS_WW }}"
-                Get-ChildItem -Path DDL\*.sql | ForEach-Object {Write-Output "Running $($_.FullName)..."
-                  psql -h $env:PGHOST -p $env:PGPORT -d $env:PGDATABASE -f &_.FullName}
+      - name: Debugging Output
+        shell: pwsh
+        run: |
+          Write-Output "Path variable: $env:Path"
+
+      - name: Run SQL scripts
+        env: 
+          PGHOST: ${{ secrets.CBS_HOSTN }}
+          PGPORT: ${{ secrets.CBS_PORT }}
+          PGUSER: ${{ secrets.CBS_USERNAME }}
+          PGPASSWORD: ${{ secrets.CBS_WW }}
+          PGDATABASE: ${{ secrets.CBS_DBNAME }}
+        shell: pwsh
+        run: |
+          $env:PGPASSWORD = "${{ secrets.CBS_WW }}"
+          $sqlFiles = Get-ChildItem -Path DDL\*.sql
+          if ($sqlFiles.Count -eq 0) {
+            Write-Output "No SQL files found in DDL directory."
+            exit 1
+          }
+          foreach ($file in $sqlFiles) {
+            Write-Output "Running $($file.FullName)..."
+            psql -h $env:PGHOST -p $env:PGPORT -U $env:PGUSER -d $env:PGDATABASE -f $file.FullName
+          }
