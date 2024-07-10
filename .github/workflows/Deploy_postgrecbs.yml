@@ -17,7 +17,7 @@ jobs:
 
       - name: Verify PostgreSQL installation directory
         run: |
-          dir "C:\Program Files\PostgreSQL\13\bin"
+          dir "C:\Program Files\PostgreSQL\16\bin"
           dir "C:\Program Files\PostgreSQL"
 
       - name: Add PostgreSQL to path
