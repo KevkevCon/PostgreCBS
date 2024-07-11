@@ -1,0 +1,33 @@
+name: Running scripts on postgre
+
+run-name: ${{ github.actor}} script is deploying to server
+
+on:
+    push:
+        branches:
+            - main
+
+    workflow_dispatch:
+
+jobs:
+    run-sql:
+        runs-on: windows-latest
+
+        steps:
+            - name: checkout/copy code
+              uses: actions/checkout@v2
+
+
+            - name: Install postgres client
+              run: choco install postgresql
+
+            - name: Run the DDL scripts
+              env:
+                PGHOST: ${{ secrets.CBS_HOST }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
+
+              run: |
+                psql -f DDL/*.sql
