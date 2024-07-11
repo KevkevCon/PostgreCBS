@@ -19,11 +19,16 @@ jobs:
 
 
             - name: Install postgres client
-              run: choco install postgresql
+              run:  
+                choco install postgresql
+    
 
-            # - name: Set the path for postgre
-            #   run: |
-            #     set /M PATH "%PATH%;C:\Program Files\PostgreSQL\16\bin"
+            - name: Set the path for postgre
+              shell: powershell
+              run: |
+                $pathToAdd = "C:\Program Files\PostgreSQL\16\bin"
+                $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+                [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$pathToAdd", "Machine")
 
             - name: Run the DDL scripts
               env:
@@ -34,6 +39,4 @@ jobs:
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
 
               run: |
-                set /M PATH "%PATH%;C:\Program Files\PostgreSQL\16\bin"
-
                 psql -f DDL/*.sql
