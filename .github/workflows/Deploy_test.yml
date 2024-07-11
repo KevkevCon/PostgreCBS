@@ -42,4 +42,4 @@ jobs:
               run: |
                 $env:PATH
                 
-                & "C:\Program Files\PostgreSQL\16\bin\psql" -f PostgreCBS/DDL/*.sql
+                & "C:\Program Files\PostgreSQL\16\bin\psql" -f *.sql
