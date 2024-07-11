@@ -41,7 +41,7 @@ jobs:
 
       - name: Run SQL scripts
         env: 
-          PGHOST: ${{ secrets.CBS_HOSTN }}
+          PGHOST: ${{ secrets.CBS_HOST }}
           PGPORT: ${{ secrets.CBS_PORT }}
           PGUSER: ${{ secrets.CBS_USERNAME }}
           PGPASSWORD: ${{ secrets.CBS_WW }}
