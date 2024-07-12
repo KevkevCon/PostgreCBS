@@ -48,3 +48,4 @@ jobs:
                 cd $env:GITHUB_WORKSPACE/DDL
                 
                 & "C:\Program Files\PostgreSQL\16\bin\psql" -f *.sql
+
