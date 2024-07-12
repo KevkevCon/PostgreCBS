@@ -46,6 +46,8 @@ jobs:
               run: | 
              
                 cd $env:GITHUB_WORKSPACE/DDL
+
+                dir
                 
                 & "C:\Program Files\PostgreSQL\16\bin\psql" -f *.sql
 
