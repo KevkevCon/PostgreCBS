@@ -21,7 +21,7 @@ BEGIN
                 Meester Character varying,
                 Complete_Missies integer,
                 'Rang' integer,
-                'Atribute 1' Character varying,
+                'Atribute 1' Character varying
 
             
           );

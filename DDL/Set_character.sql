@@ -14,14 +14,14 @@ BEGIN
           (
                 FirstName Character varying,
                 LastName Character varying,
-                D.O.B Date,
+                "D.O.B" Date,
                 Gender Character varying,
                 Shool Character varying,
-                Group Integer,
+                "Group" Integer,
                 Sensei Character varying,
                 Missions_completed integer,
-                'Level' integer,
-                'Atribute 1' Character varying,
+                "Level" integer,
+                "Atribute_1" Character varying
 
             
           );
