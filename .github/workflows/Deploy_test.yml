@@ -49,5 +49,6 @@ jobs:
 
                 dir
                 
-                & "C:\Program Files\PostgreSQL\16\bin\psql" -f Set_character.sql
-
+                Get-ChildItem -Filter *.sql | ForEach-Object {
+                & "C:\Program Files\PostgreSQL\16\bin\psql" -f $_.FullName}
+                                                                                 
