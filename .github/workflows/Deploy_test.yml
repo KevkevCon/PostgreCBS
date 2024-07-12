@@ -8,7 +8,7 @@ on:
             - main
 
     workflow_dispatch:
-            # hello
+            
 jobs:
     run-sql:
         runs-on: windows-latest
@@ -30,6 +30,10 @@ jobs:
                 $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
                 [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$pathToAdd", "Machine")
 
+            - name: List contents of GITHUB_WORKSPACE
+              run: |
+               dir $env:GITHUB_WORKSPACE
+
             - name: Run the DDL scripts
               shell: powershell
               env:
@@ -39,7 +43,8 @@ jobs:
                 PGPASSWORD: ${{ secrets.CBS_WW }}
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
 
-              run: |
-                $env:PATH
+              run: | 
+             
+                cd $env:GITHUB_WORKSPACE/Development/DDL
                 
-                & "C:\Program Files\PostgreSQL\16\bin\psql" -f PostgreCBS/DDL/*.sql
+                & "C:\Program Files\PostgreSQL\16\bin\psql" -f *.sql
