@@ -20,8 +20,8 @@ BEGIN
                 Groep Integer,
                 Meester Character varying,
                 Complete_Missies integer,
-                'Rang' integer,
-                'Atribute 1' Character varying
+                "Rang" integer,
+                "Atribute_1" Character varying
 
             
           );
