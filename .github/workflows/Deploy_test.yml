@@ -32,7 +32,7 @@ jobs:
 
             - name: List contents of GITHUB_WORKSPACE
               run: |
-               dir $env:GITHUB_WORKSPACE\Development
+               dir $env:GITHUB_WORKSPACE
 
             - name: Run the DDL scripts
               shell: powershell
