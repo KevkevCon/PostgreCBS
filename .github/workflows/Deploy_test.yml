@@ -49,5 +49,5 @@ jobs:
 
                 dir
                 
-                & "C:\Program Files\PostgreSQL\16\bin\psql" -f *.sql
+                & "C:\Program Files\PostgreSQL\16\bin\psql" -f Set_character.sql
 
