@@ -1,5 +1,5 @@
 name: Running scripts on postgre
-
+# Deze runs alle scripts van de main branch in de postgreSQL server
 run-name: ${{ github.actor}} script is deploying to server
 
 on:
