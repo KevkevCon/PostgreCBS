@@ -23,7 +23,7 @@ BEGIN
 			 					Grand_Master boolean
  
             
-          );
+        
  
  
         -- Commit the transaction
