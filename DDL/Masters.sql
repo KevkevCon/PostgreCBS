@@ -19,7 +19,7 @@ BEGIN
                 "Group" Integer,
 		             Mastery charactervarying,	
                 "Level" integer,
-                "Atribute_1" Character varying,
+                "Atribute_1" Character varying
 			 					Grand_Master boolean
  
             
