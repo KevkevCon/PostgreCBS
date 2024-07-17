@@ -18,7 +18,8 @@ BEGIN
                 World_Size numeric,
                 Factions character varying,
                 Difficulty integer,
-                "Type" character varying
+                "Type" character varying,
+                Population integer
 
 
 
