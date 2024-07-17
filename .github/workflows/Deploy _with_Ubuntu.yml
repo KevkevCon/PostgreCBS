@@ -24,7 +24,7 @@ jobs:
               run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
             - name: List the contents of the git repo
-              run: Is -Ia $GITHUB_WORKSPACE
+              run: ls -la $GITHUB_WORKSPACE
 
             - name: run the DDL scripts
               env:
