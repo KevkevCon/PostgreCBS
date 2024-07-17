@@ -1,0 +1,44 @@
+# Dit is een delpoy workflow 
+# met de Ubuntu-runner
+
+name: Deploy with ubuntu
+
+run-name: ${{ github.actor }} code is being deployed 
+
+on:
+    
+    
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+jobs:
+    run-sql: 
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: checkout/copy code repo
+              uses: actions/checkout@v2
+
+            - name: Install PostgreSQL client
+              run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+            - name: List the contents of the git repo
+              run: 1s -la $GITHUB_WORKSPACE
+
+            - name: run the DDL scripts
+              env:
+                PGHOST: ${{ secrets.CBS_HOST }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
+
+              run: |
+                cd $GITHUB_WORKSPACE/DDL
+                for flie in *.sql; do
+                    psql -f "$file"
+                done
+
+         
+    
