@@ -26,6 +26,9 @@ jobs:
             - name: List the contents of the git repo
               run: ls -la $GITHUB_WORKSPACE
 
+            - name: Check contents of DDL
+              run: ls -la $GITHUB_WORKSPACE/DDL
+
             - name: run the DDL scripts
               env:
                 PGHOST: ${{ secrets.CBS_HOST }}
@@ -36,7 +39,7 @@ jobs:
 
               run: |
                 cd $GITHUB_WORKSPACE/DDL
-                for flie in *.sql; do
+                for file in *.sql; do
                     psql -f "$file"
                 done
 
