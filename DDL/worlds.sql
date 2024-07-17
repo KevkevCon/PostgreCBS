@@ -16,7 +16,7 @@ BEGIN
                 World_number integer,
                 World_status character varying,
                 Factions character varying,
-                Difficulty integer,
+                Difficulty integer
 
 
 
