@@ -1,7 +1,7 @@
 name: Test_postgrecode_and_fix
 
 
-run-name: pushed script from ${{ github.actor}} is being tested and errors fixed(if applicable)
+run-name: The pushed script from ${{ github.actor}} is being tested 
 
 on: 
     push:

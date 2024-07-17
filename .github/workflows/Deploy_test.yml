@@ -12,28 +12,29 @@ on:
 jobs:
     run-sql:
         runs-on: windows-latest
-
+# !ste stap copieert de repo in de runner
         steps:
             - name: checkout/copy code
               uses: actions/checkout@v2
 
-
+# Installeert postgre client met choco install in powershell
             - name: Install postgres client
               run:  
                 choco install postgresql
     
-
+# set de path van postgresql want deze wordt niet automatisch gebruikt in powershell
             - name: Set the path for postgre
               shell: powershell
               run: |
                 $pathToAdd = "C:\Program Files\PostgreSQL\16\bin"
                 $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
                 [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$pathToAdd", "Machine")
-
+#Een lijst van de contents van de git repo
             - name: List contents of GITHUB_WORKSPACE
               run: |
                dir $env:GITHUB_WORKSPACE
-
+# Hier worden de credentials van de postgreSQL server gegeven als secrets en daarna
+# wordt in de current directory van de git repo de scripts gerund..
             - name: Run the DDL scripts
               shell: powershell
               env:
