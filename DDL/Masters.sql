@@ -14,16 +14,16 @@ BEGIN
           (
                 FirstName Character varying,
                 LastName Character varying,
-                "D.O.B"     Date,
+                "D.O.B" Date,
                 Gender Character varying,
                 "Group" Integer,
-		             Mastery charactervarying,	
+		        Mastery charactervarying,	
                 "Level" integer,
-                "Atribute_1" Character varying
-			 					Grand_Master boolean
+                "Atribute_1" Character varying,
+			 	Grand_Master boolean
  
             
-          )
+          );
  
  
         -- Commit the transaction
