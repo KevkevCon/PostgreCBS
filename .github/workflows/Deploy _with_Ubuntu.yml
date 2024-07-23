@@ -14,9 +14,7 @@ on:
         
         paths:
             - DDL/**
-        paths-ignore:
-            - .github/* 
-             
+
     workflow_dispatch:
 jobs:
     run-sql: 

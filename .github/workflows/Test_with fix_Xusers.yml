@@ -9,8 +9,6 @@ on:
         - Development
         
  
-            
-
     workflow_dispatch:
     # Deze workflow is reusable in de toekomst
     workflow_call:
