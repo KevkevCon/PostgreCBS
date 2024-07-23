@@ -9,7 +9,9 @@ on:
         - Development
       paths: 
         - DDL
- 
+      paths-ignore:
+        - .github/* 
+           
             
 
     workflow_dispatch:
