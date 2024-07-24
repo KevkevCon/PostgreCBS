@@ -3,11 +3,11 @@ name: Sync DDl scripts
 run-name: Syncing DDL scripts with main
 
 on: 
-    # push:
-    #     branches:
-    #         - main
-    #     paths:
-    #         - DDL/**
+    push:
+         branches:
+             - main
+         paths:
+             - DDL/**
     workflow_dispatch:
 
     
