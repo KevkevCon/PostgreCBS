@@ -48,16 +48,13 @@ jobs:
                   table=$(basename "$file" .sql)
                   echo "Processing $table"
 
-                  # Check if table exists and has different columns
+   
                   if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
                     echo "Table $table exists, checking columns"
                     
-                    # Get columns from existing table
+             
                     existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';")
                     
-                    # Get columns from DDL script
-                    # Assuming a comment or specific pattern for column information in SQL scripts
-                    # This might need to be adapted based on your SQL scripts
                     script_columns=$(grep -oP 'COLUMN \K\w+' "$file")
 
                     if [ "$existing_columns" != "$script_columns" ]; then
