@@ -35,30 +35,24 @@ jobs:
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
               run: |
                 cd $GITHUB_WORKSPACE/DDL
+
                 for file in *.sql; do
-                  psql -f "$file"
-                done
+                  tablename=$(basename "$file" .sql)
+                  echo "Processing $tablename"
 
-            - name: Cleanup database
-              env:
-                PGHOST: ${{ secrets.CBS_HOST }}
-                PGPORT: ${{ secrets.CBS_PORT }}
-                PGUSER: ${{ secrets.CBS_USERNAME }}
-                PGPASSWORD: ${{ secrets.CBS_WW }}
-                PGDATABASE: ${{ secrets.CBS_DBNAME }}
-              run: |
-               psql -c "
-               DO \$\$ 
-               DECLARE
-                 rec RECORD;
-               BEGIN
-                
-                 FOR rec IN SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' LOOP
+                  existing_columns=$(psql -t -c "
+                    SELECT column_name || ' ' || data_type 
+                    FROM information_schema.columns 
+                    WHERE table_name = '$tablename' 
+                    ORDER BY ordinal_position;")
 
-                   IF NOT EXISTS (SELECT 1 FROM pgls_dir('DDL') WHERE pg_ls_dir ~* rec.table_name || '.sql$') THEN
-                      EXECUTE 'DROP TABLE IF EXISTS ' || rec.table_name || ' CASCADE';
-                    END IF;
-                  END LOOP;
-               END
-               \$\$
-               LANGUAGE plpgsql;"
+                  ddl_columns=$(grep -oP '(\w+ \w+)(?=,|$)' "$file" | tr '\n' ',' | sed 's/,$//')
+
+                  if [[ "$existing_columns" != "$ddl_columns" ]]; then
+                    echo "Table $tablename structure mismatch. Dropping and recreating..."
+                    psql -c "DROP TABLE IF EXISTS $tablename CASCADE;"
+                    psql -f "$file"
+                  else
+                    echo "Table $tablename structure matches. No action needed."
+                  fi
+                 done
