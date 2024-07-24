@@ -10,7 +10,7 @@ BEGIN
 
             -- Example: Creating a table
 
-          CREATE TABLE IF NOT EXISTS raw."Character"
+          CREATE TABLE IF NOT EXISTS raw."Set_Character"
           (
                 FirstName Character varying,
                 LastName Character varying,
