@@ -36,6 +36,26 @@ jobs:
               run: |
                 cd $GITHUB_WORKSPACE/DDL
 
+
+                ddl_tables=$(for file in *.sql; do basename "$file" .sql; done)
+                echo "DDL Tables: $ddl_tables"
+
+
+                db_tables=$(psql -t -c "
+                  SELECT tablename
+                  FROM pg_tables
+                  WHERE schemaname = 'public';")
+                echo "Database Tables: $db_tables"
+
+         
+                for table in $db_tables; do
+                  if [[ ! " $ddl_tables " =~ " $table " ]]; then
+                    echo "Dropping table $table as it is not in the DDL folder"
+                    psql -c "DROP TABLE IF EXISTS $table CASCADE;"
+                  fi
+                done
+
+      
                 for file in *.sql; do
                   tablename=$(basename "$file" .sql)
                   echo "Processing $tablename"

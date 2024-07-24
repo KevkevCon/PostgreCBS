@@ -10,7 +10,7 @@ BEGIN
 
             -- Example: Creating a table
 
-          CREATE TABLE IF NOT EXISTS raw."CharacterNederlands"
+          CREATE TABLE IF NOT EXISTS raw."Set_characterNed"
           (
                 EersteNaam Character varying,
                 TweedeNaam Character varying,
