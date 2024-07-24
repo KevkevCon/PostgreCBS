@@ -34,24 +34,37 @@ jobs:
                 PGPASSWORD: ${{ secrets.CBS_WW }}
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
               run: |
-                cd $GITHUB_WORKSPACE/DDL
+                set -e  # Exit on error
 
+                cd $GITHUB_WORKSPACE/DDL
 
                 ddl_tables=$(for file in *.sql; do basename "$file" .sql; done)
                 echo "DDL Tables: $ddl_tables"
                 
-                db_tables=$(psql -t -c "
-                  SELECT tablename
-                  FROM pg_tables
-                  WHERE schemaname = 'public';")
+                db_tables=$(psql -t -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public';")
                 echo "Database Tables: $db_tables"
 
                 for file in *.sql; do
                   table=$(basename "$file" .sql)
                   echo "Processing $table"
 
-                  echo "Dropping table $table if it exists"
-                  psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
+                  # Check if table exists and has different columns
+                  if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
+                    echo "Table $table exists, checking columns"
+                    
+                    # Get columns from existing table
+                    existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';")
+                    
+                    # Get columns from DDL script
+                    # Assuming a comment or specific pattern for column information in SQL scripts
+                    # This might need to be adapted based on your SQL scripts
+                    script_columns=$(grep -oP 'COLUMN \K\w+' "$file")
+
+                    if [ "$existing_columns" != "$script_columns" ]; then
+                      echo "Dropping table $table due to column mismatch"
+                      psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
+                    fi
+                  fi
 
                   echo "Running script $file"
                   psql -f "$file"
@@ -63,4 +76,3 @@ jobs:
                     psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
                   fi
                 done
-                
