@@ -1,0 +1,64 @@
+name: Sync DDl scripts
+
+run-name: Syncing DDL scripts with main
+
+on: 
+    # push:
+    #     branches:
+    #         - main
+    #     paths:
+    #         - DDL/**
+    workflow_dispatch:
+
+    
+jobs:
+    syncing-ddl:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check the code
+              uses: actions/checkout@v2
+
+
+            - name: Install postgre client
+              run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+            - name: List contents of DDL
+              run: ls -la $GITHUB_WORKSPACE/DDL
+
+            - name: Sync with Database
+              env:
+                PGHOST: ${{ secrets.CBS_HOST }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
+              run: |
+                cd $GITHUB_WORKSPACE/DDL
+                for file in *.sql; do
+                  psql -f "$file"
+                done
+
+            - name: Cleanup database
+              env:
+                PGHOST: ${{ secrets.CBS_HOST }}
+                PGPORT: ${{ secrets.CBS_PORT }}
+                PGUSER: ${{ secrets.CBS_USERNAME }}
+                PGPASSWORD: ${{ secrets.CBS_WW }}
+                PGDATABASE: ${{ secrets.CBS_DBNAME }}
+              run: |
+               psql -c "
+               DO \$\$ 
+               DECLARE
+                 rec RECORD;
+               BEGIN
+                
+                 FOR rec IN SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' LOOP
+
+                   IF NOT EXISTS (SELECT 1 FROM pgls_dir('DDL') WHERE pg_ls_dir ~* rec.table_name || '.sql$') THEN
+                      EXECUTE 'DROP TABLE IF EXISTS ' || rec.table_name || ' CASCADE';
+                    END IF;
+                  END LOOP;
+               END
+               \$\$
+               LANGUAGE plpsql;"
