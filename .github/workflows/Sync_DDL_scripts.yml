@@ -39,40 +39,28 @@ jobs:
 
                 ddl_tables=$(for file in *.sql; do basename "$file" .sql; done)
                 echo "DDL Tables: $ddl_tables"
-
-
+                
                 db_tables=$(psql -t -c "
                   SELECT tablename
                   FROM pg_tables
                   WHERE schemaname = 'public';")
                 echo "Database Tables: $db_tables"
 
-         
+                for file in *.sql; do
+                  table=$(basename "$file" .sql)
+                  echo "Processing $table"
+
+                  echo "Dropping table $table if it exists"
+                  psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
+
+                  echo "Running script $file"
+                  psql -f "$file"
+                done
+
                 for table in $db_tables; do
                   if [[ ! " $ddl_tables " =~ " $table " ]]; then
                     echo "Dropping table $table as it is not in the DDL folder"
-                    psql -c "DROP TABLE IF EXISTS $table CASCADE;"
+                    psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
                   fi
                 done
-
-      
-                for file in *.sql; do
-                  tablename=$(basename "$file" .sql)
-                  echo "Processing $tablename"
-
-                  existing_columns=$(psql -t -c "
-                    SELECT column_name || ' ' || data_type 
-                    FROM information_schema.columns 
-                    WHERE table_name = '$tablename' 
-                    ORDER BY ordinal_position;")
-
-                  ddl_columns=$(grep -oP '(\w+ \w+)(?=,|$)' "$file" | tr '\n' ',' | sed 's/,$//')
-
-                  if [[ "$existing_columns" != "$ddl_columns" ]]; then
-                    echo "Table $tablename structure mismatch. Dropping and recreating..."
-                    psql -c "DROP TABLE IF EXISTS $tablename CASCADE;"
-                    psql -f "$file"
-                  else
-                    echo "Table $tablename structure matches. No action needed."
-                  fi
-                 done
+                
