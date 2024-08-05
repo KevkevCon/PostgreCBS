@@ -1,3 +1,9 @@
+# Deze workflow checks de git repo
+# kijkt als die overeenkomt wat er in de slq server is
+# als de slq server niet hetzelfde is gaat het  de tables die overeen komen verwijderen en dan opnieuw 
+# crieren in de server met de ddl script
+
+
 name: Sync DDl scripts
 
 run-name: Syncing DDL scripts with main
@@ -53,9 +59,14 @@ jobs:
                     echo "Table $table exists, checking columns"
                     
              
-                    existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';")
+                    existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';" | xargs)
                     
                     script_columns=$(grep -oP 'COLUMN \K\w+' "$file")
+                    echo "Existing Columns: $existing_columns"
+
+                    script_columns=$(grep -oP '^\s*\w+\s+\w+' "$file" | awk '{print $1}' | xargs)
+                    echo "Script Columns: $script_columns"
+
 
                     if [ "$existing_columns" != "$script_columns" ]; then
                       echo "Dropping table $table due to column mismatch"
