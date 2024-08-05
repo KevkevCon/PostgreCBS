@@ -60,7 +60,15 @@ jobs:
                     existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';" | tr -d ' ' | tr '\n' ' ')
                     echo "Existing Columns: $existing_columns"
 
-                    script_columns=$(awk '/CREATE TABLE/,/^\s*\);/ {if ($1 ~ /^[a-zA-Z_]/) print $1}' "$file" | tr -d ' ' | tr '\n' ' ' | sed 's/,$//')
+              
+                    script_columns=$(awk '
+                      /CREATE TABLE/,/^\s*\);/ {
+                        if ($1 ~ /^[a-zA-Z_"]+/ && $2 ~ /^[a-zA-Z_"]+/) {
+                          gsub(/["]/, "", $2);  # Remove quotes
+                          print $2
+                        }
+                      }
+                    ' "$file" | tr -d ' ' | tr '\n' ' ')
                     echo "Script Columns: $script_columns"
 
                     if [ "$existing_columns" != "$script_columns" ]; then
@@ -79,4 +87,3 @@ jobs:
                     psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
                   fi
                 done
-                
