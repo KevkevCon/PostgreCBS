@@ -46,7 +46,7 @@ jobs:
 
                 ddl_tables=$(for file in *.sql; do basename "$file" .sql; done)
                 echo "DDL Tables: $ddl_tables"
-                
+
                 db_tables=$(psql -t -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public';")
                 echo "Database Tables: $db_tables"
 
@@ -54,19 +54,14 @@ jobs:
                   table=$(basename "$file" .sql)
                   echo "Processing $table"
 
-   
                   if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
                     echo "Table $table exists, checking columns"
-                    
-             
+
                     existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';" | tr -d ' ' | tr '\n' ' ')
                     echo "Existing Columns: $existing_columns"
 
-                    script_columns=$(grep -oP '(?i)CREATE\s+TABLE.*?\((.*?)\)' "$file" | grep -oP '\w+\s+\w+' | awk '{print $1}' | tr -d ' ' | tr '\n' ' ')
+                    script_columns=$(grep -oP '(?<=\bCREATE\s+TABLE\s+\w+\s*\()(.|\n)*?(?=\))' "$file" | grep -oP '\w+\s+\w+' | awk '{print $1}' | tr -d ' ' | tr '\n' ' ')
                     echo "Script Columns: $script_columns"
-
-
-
 
                     if [ "$existing_columns" != "$script_columns" ]; then
                       echo "Dropping table $table due to column mismatch"
@@ -84,3 +79,4 @@ jobs:
                     psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
                   fi
                 done
+                
