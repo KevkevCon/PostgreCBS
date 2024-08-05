@@ -60,7 +60,7 @@ jobs:
                     existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';" | tr -d ' ' | tr '\n' ' ')
                     echo "Existing Columns: $existing_columns"
 
-                    script_columns=$(grep -oP '(?<=\bCREATE\s+TABLE\s+\w+\s*\()(.|\n)*?(?=\))' "$file" | grep -oP '\w+\s+\w+' | awk '{print $1}' | tr -d ' ' | tr '\n' ' ')
+                    script_columns=$(grep -oP '^\s*\w+\s+\w+' "$file" | awk '{print $1}' | tr -d ' ' | tr '\n' ' ')
                     echo "Script Columns: $script_columns"
 
                     if [ "$existing_columns" != "$script_columns" ]; then
