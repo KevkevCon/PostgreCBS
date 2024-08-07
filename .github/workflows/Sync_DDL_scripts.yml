@@ -26,23 +26,26 @@ jobs:
               uses: actions/checkout@v2
 
 
-            - name: Install postgre client
-              run: sudo apt-get update && sudo apt-get install -y postgresql-client
-
+            - name: Install PostgreSQL client
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y postgresql-client
+        
             - name: Identify modified or new SQL scripts
               id: diff
               run: |
                 git fetch origin main
                 diff_files=$(git diff --name-only origin/main -- DDL/*.sql | tr '\n' ' ')
                 echo "diff_files=$diff_files" >> $GITHUB_ENV
-                echo "::set-output name=diff_files::$diff_files"
-      
+                echo "Identified modified or new SQL scripts: $diff_files"
+              shell: bash
+        
             - name: List modified or new SQL scripts
               run: |
                 echo "Modified or new SQL scripts: ${{ env.diff_files }}"
-      
+        
             - name: Sync with Database
-              if: ${{ env.diff_files != '' }}
+              if: env.diff_files != ''
               env:
                 PGHOST: ${{ secrets.CBS_HOST }}
                 PGPORT: ${{ secrets.CBS_PORT }}
@@ -51,22 +54,16 @@ jobs:
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
               run: |
                 set -e  # Exit on error
-      
-                cd $GITHUB_WORKSPACE/DDL
-      
-               
-                diff_files="${{ env.diff_files }}"
-                echo "Processing files: $diff_files"
-      
-                for file in $diff_files; do
-                  table=$(basename "$file" .sql)
-                  echo "Processing $table"
-      
-                  if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
-                    echo "Dropping existing table $table"
-                    psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
+                cd DDL
+                for file in ${{ env.diff_files }}; do
+                  table_name=$(basename "$file" .sql)
+                  echo "Processing $table_name"
+                  
+                  if psql -c "\dt" | grep -q "$table_name"; then
+                    echo "Table $table_name exists, dropping it"
+                    psql -c "DROP TABLE IF EXISTS $table_name"
                   fi
-      
+                  
                   echo "Running script $file"
                   psql -f "$file"
                 done
