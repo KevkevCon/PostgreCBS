@@ -35,36 +35,38 @@ jobs:
                 git fetch origin main
                 diff_files=$(git diff --name-only origin/main -- DDL/*.sql | tr '\n' ' ')
                 echo "diff_files=$diff_files" >> $GITHUB_ENV
-
+                echo "::set-output name=diff_files::$diff_files"
+      
             - name: List modified or new SQL scripts
-              run: echo "Modified or new SQL scripts": "${{ steps.diff.outputs.diff_files }}"
-
+              run: |
+                echo "Modified or new SQL scripts: ${{ env.diff_files }}"
+      
             - name: Sync with Database
-              if: steps.diff.outputs.diff_files != ''
+              if: ${{ env.diff_files != '' }}
               env:
                 PGHOST: ${{ secrets.CBS_HOST }}
                 PGPORT: ${{ secrets.CBS_PORT }}
                 PGUSER: ${{ secrets.CBS_USERNAME }}
                 PGPASSWORD: ${{ secrets.CBS_WW }}
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
-                run: |
-                  set -e  # Exit on error
-
-                  cd $GITHUB_WORKSPACE/DDL
-
-          
-                  diff_files="${{ steps.diff.outputs.diff_files }}"
-                  echo "Processing files: $diff_files"
-
-                  for file in $diff_files; do
-                    table=$(basename "$file" .sql)
-                    echo "Processing $table"
-
-                    if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
-                      echo "Dropping existing table $table"
-                      psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
-                    fi
-
-                    echo "Running script $file"
-                    psql -f "$file"
-                  done
+              run: |
+                set -e  # Exit on error
+      
+                cd $GITHUB_WORKSPACE/DDL
+      
+               
+                diff_files="${{ env.diff_files }}"
+                echo "Processing files: $diff_files"
+      
+                for file in $diff_files; do
+                  table=$(basename "$file" .sql)
+                  echo "Processing $table"
+      
+                  if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
+                    echo "Dropping existing table $table"
+                    psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
+                  fi
+      
+                  echo "Running script $file"
+                  psql -f "$file"
+                done
