@@ -20,6 +20,7 @@ BEGIN
                 "Group" Integer,
                 Sensei Character varying,
                 Missions_completed integer,
+                Misions integer,
                 "Level" integer,
                 "Atribute_1" Character varying
 

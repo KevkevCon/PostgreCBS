@@ -17,7 +17,6 @@ BEGIN
                 "D.O.B" Date,
                 Gender Character varying,
                 "Group" Integer,
-                Class character varying,
 		        Mastery character varying,	
                 "Level" integer,
 			 	Grand_Master boolean
