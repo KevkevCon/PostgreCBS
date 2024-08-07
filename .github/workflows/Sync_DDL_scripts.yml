@@ -29,67 +29,42 @@ jobs:
             - name: Install postgre client
               run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-            - name: List contents of DDL
-              run: ls -la $GITHUB_WORKSPACE/DDL
+            - name: Identify modified or new SQL scripts
+              id: diff
+              run: |
+                git fetch origin main
+                diff_files=$(git diff --name-only origin/main -- DDL/*.sql | tr '\n' ' ')
+                echo "diff_files=$diff_files" >> $GITHUB_ENV
+
+            - name: List modified or new SQL scripts
+              run: echo "Modified or new SQL scripts": "${{ steps.diff.outputs.diff_files }}"
 
             - name: Sync with Database
+              if: steps.diff.outputs.diff_files != ''
               env:
                 PGHOST: ${{ secrets.CBS_HOST }}
                 PGPORT: ${{ secrets.CBS_PORT }}
                 PGUSER: ${{ secrets.CBS_USERNAME }}
                 PGPASSWORD: ${{ secrets.CBS_WW }}
                 PGDATABASE: ${{ secrets.CBS_DBNAME }}
-              run: |
-                set -e  # Exit on error
+                run: |
+                  set -e  # Exit on error
 
-                cd $GITHUB_WORKSPACE/DDL
-
-                              
-                ddl_tables=$(for file in *.sql; do basename "$file" .sql; done)
-                echo "DDL Tables: $ddl_tables"
+                  cd $GITHUB_WORKSPACE/DDL
 
           
-                db_tables=$(psql -t -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public';")
-                echo "Database Tables: $db_tables"
+                  diff_files="${{ steps.diff.outputs.diff_files }}"
+                  echo "Processing files: $diff_files"
 
-         
-                for table in $db_tables; do
-                  if [[ ! " $ddl_tables " =~ " $table " ]]; then
-                    echo "Dropping table $table as it is not in the DDL folder"
-                    psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
-                  fi
-                done
+                  for file in $diff_files; do
+                    table=$(basename "$file" .sql)
+                    echo "Processing $table"
 
-          
-                for file in *.sql; do
-                  table=$(basename "$file" .sql)
-                  echo "Processing $table"
-
-                  if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
-                    echo "Table $table exists, checking columns"
-
-              
-                    existing_columns=$(psql -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = '$table';" | tr -d ' ' | tr '\n' ' ')
-                    echo "Existing Columns: $existing_columns"
-
-              
-                    script_columns=$(awk '
-                      /CREATE TABLE/,/^\s*\);/ {
-                        if ($1 ~ /^[a-zA-Z_"]+/ && $2 ~ /^[a-zA-Z_"]+/) {
-                          gsub(/["]/, "", $2);  # Remove quotes
-                          print $2
-                        }
-                      }
-                    ' "$file" | tr -d ' ' | tr '\n' ' ')
-                    echo "Script Columns: $script_columns"
-
-                    if [ "$existing_columns" != "$script_columns" ]; then
-                      echo "Dropping table $table due to column mismatch"
+                    if psql -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '$table');" | grep -q 't'; then
+                      echo "Dropping existing table $table"
                       psql -c "DROP TABLE IF EXISTS \"$table\" CASCADE;"
                     fi
-                  fi
 
-            
-                  echo "Running script $file"
-                  psql -f "$file"
-                done
+                    echo "Running script $file"
+                    psql -f "$file"
+                  done
