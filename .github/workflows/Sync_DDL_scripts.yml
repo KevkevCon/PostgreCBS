@@ -47,11 +47,11 @@ jobs:
             echo "diff_files=$diff_files" >> $GITHUB_ENV
             echo "Identified modified or new SQL scripts: $diff_files"
           shell: bash
-
+    
         - name: List modified or new SQL scripts
           run: |
             echo "Modified or new SQL scripts: ${{ env.diff_files }}"
-
+    
         - name: Sync with Database
           if: env.diff_files != ''
           env:
@@ -66,12 +66,13 @@ jobs:
             for file in ${{ env.diff_files }}; do
               table_name=$(basename "$file" .sql)
               echo "Processing $table_name"
-          
+              
               if psql -c "\dt" | grep -q "$table_name"; then
                 echo "Table $table_name exists, dropping it"
                 psql -c "DROP TABLE IF EXISTS $table_name"
               fi
-          
+              
               echo "Running script $file"
               psql -f "$file"
             done
+          shell: bash
