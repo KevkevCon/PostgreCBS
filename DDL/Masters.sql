@@ -19,6 +19,7 @@ BEGIN
                 "Group" Integer,
 		        Mastery character varying,	
                 "Level" integer,
+                test boolean,
 			 	Grand_Master boolean
 
  
