@@ -22,48 +22,56 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Check the code
-              uses: actions/checkout@v2
+        - name: Check out code
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0  # Fetch all history for git diff
 
+        - name: Install PostgreSQL client
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client
 
-            - name: Install PostgreSQL client
-              run: |
-                sudo apt-get update
-                sudo apt-get install -y postgresql-client
-        
-            - name: Identify modified or new SQL scripts
-              id: diff
-              run: |
-                git fetch origin main
-                diff_files=$(git diff --name-only origin/main -- DDL/*.sql | tr '\n' ' ')
-                echo "diff_files=$diff_files" >> $GITHUB_ENV
-                echo "Identified modified or new SQL scripts: $diff_files"
-              shell: bash
-        
-            - name: List modified or new SQL scripts
-              run: |
-                echo "Modified or new SQL scripts: ${{ env.diff_files }}"
-        
-            - name: Sync with Database
-              if: env.diff_files != ''
-              env:
-                PGHOST: ${{ secrets.CBS_HOST }}
-                PGPORT: ${{ secrets.CBS_PORT }}
-                PGUSER: ${{ secrets.CBS_USERNAME }}
-                PGPASSWORD: ${{ secrets.CBS_WW }}
-                PGDATABASE: ${{ secrets.CBS_DBNAME }}
-              run: |
-                set -e  # Exit on error
-                cd DDL
-                for file in ${{ env.diff_files }}; do
-                  table_name=$(basename "$file" .sql)
-                  echo "Processing $table_name"
-                  
-                  if psql -c "\dt" | grep -q "$table_name"; then
-                    echo "Table $table_name exists, dropping it"
-                    psql -c "DROP TABLE IF EXISTS $table_name"
-                  fi
-                  
-                  echo "Running script $file"
-                  psql -f "$file"
-                done
+        - name: Verify Git Fetch
+          run: |
+            git fetch origin main
+            git log --oneline
+          shell: bash
+
+        - name: Identify modified or new SQL scripts
+          id: diff
+          run: |
+            git fetch origin main
+            git diff --name-only origin/main -- DDL/*.sql | tee diff_files.txt
+            diff_files=$(cat diff_files.txt | tr '\n' ' ')
+            echo "diff_files=$diff_files" >> $GITHUB_ENV
+            echo "Identified modified or new SQL scripts: $diff_files"
+          shell: bash
+
+        - name: List modified or new SQL scripts
+          run: |
+            echo "Modified or new SQL scripts: ${{ env.diff_files }}"
+
+        - name: Sync with Database
+          if: env.diff_files != ''
+          env:
+            PGHOST: ${{ secrets.CBS_HOST }}
+            PGPORT: ${{ secrets.CBS_PORT }}
+            PGUSER: ${{ secrets.CBS_USERNAME }}
+            PGPASSWORD: ${{ secrets.CBS_WW }}
+            PGDATABASE: ${{ secrets.CBS_DBNAME }}
+          run: |
+            set -e  # Exit on error
+            cd DDL
+            for file in ${{ env.diff_files }}; do
+              table_name=$(basename "$file" .sql)
+              echo "Processing $table_name"
+          
+              if psql -c "\dt" | grep -q "$table_name"; then
+                echo "Table $table_name exists, dropping it"
+                psql -c "DROP TABLE IF EXISTS $table_name"
+              fi
+          
+              echo "Running script $file"
+              psql -f "$file"
+            done
