@@ -47,29 +47,29 @@ jobs:
           id: diff
           run: |
             git fetch origin main
-            git diff --name-only origin/main -- DDL/*.sql | tee diff_files.txt
+            git diff --name-only FETCH_HEAD HEAD -- DDL/*.sql | tee diff_files.txt
             echo "Contents of diff_files.txt:"
             cat diff_files.txt
             diff_files=$(cat diff_files.txt | tr '\n' ' ')
-            echo "::set-output name=diff_files::$diff_files"
+            echo "diff_files=$diff_files" >> $GITHUB_ENV
             echo "Identified modified or new SQL scripts: $diff_files"
           shell: bash
     
         - name: List modified or new SQL scripts
           run: |
-            echo "Modified or new SQL scripts: ${{ steps.diff.outputs.diff_files }}"
+            echo "Modified or new SQL scripts: ${{ env.diff_files }}"
     
         - name: Debug diff_files variable
           run: |
-            echo "Debug: diff_files = ${{ steps.diff.outputs.diff_files }}"
-            if [ -z "${{ steps.diff.outputs.diff_files }}" ]; then
+            echo "Debug: diff_files = ${{ env.diff_files }}"
+            if [ -z "${{ env.diff_files }}" ]; then
               echo "No SQL files to process."
             else
-              echo "Files to process: ${{ steps.diff.outputs.diff_files }}"
+              echo "Files to process: ${{ env.diff_files }}"
             fi
     
         - name: Sync with Database
-          if: ${{ steps.diff.outputs.diff_files }}
+          if: ${{ env.diff_files != '' }}
           env:
             PGHOST: ${{ secrets.CBS_HOST }}
             PGPORT: ${{ secrets.CBS_PORT }}
@@ -79,7 +79,7 @@ jobs:
           run: |
             set -e  # Exit on error
             cd DDL
-            for file in ${{ steps.diff.outputs.diff_files }}; do
+            for file in ${{ env.diff_files }}; do
               table_name=$(basename "$file" .sql)
               echo "Processing $table_name"
               
@@ -92,3 +92,4 @@ jobs:
               psql -f "$file"
             done
           shell: bash
+        
