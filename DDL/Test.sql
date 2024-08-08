@@ -16,7 +16,8 @@ BEGIN
                 Test Character varying,
                 tester Character varying,
                 tested boolean,
-                Tester_name Character varying
+                Tester_name Character varying,
+                "Start_date" Date
 
  
             
