@@ -15,7 +15,8 @@ BEGIN
                 FirstName Character varying,
                 Test Character varying,
                 tester Character varying,
-                tested boolean
+                tested boolean,
+                Tester_id Integer
 
  
             
