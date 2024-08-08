@@ -82,9 +82,15 @@ jobs:
               echo "Processing $file"
               table_name=$(basename "$file" .sql)
                 
-              if psql -c "\dt" | grep -q "$table_name"; then
-                echo "Table $table_name exists, dropping it"
-                psql -c "DROP TABLE IF EXISTS $table_name"
+               
+              extracted_table_name=$(grep -i 'create table' $file | awk '{print $3}' | tr -d '"')
+                
+              if [ -n "$extracted_table_name" ]; then
+                echo "Dropping table $extracted_table_name if it exists"
+                psql -c "DROP TABLE IF EXISTS $extracted_table_name"
+              else
+                echo "No table creation statement found in $file"
+                exit 1
               fi
                 
               echo "Running script $file"
