@@ -16,7 +16,7 @@ BEGIN
                 Test Character varying,
                 tester Character varying,
                 tested boolean,
-                Tester_id Integer
+              
 
  
             
