@@ -20,7 +20,6 @@ BEGIN
                 Groep Integer,
                 Meester Character varying,
                 afgeronde_Missies integer,
-                "Rang" integer,
                 "Atribute_1" Character varying
 
             
