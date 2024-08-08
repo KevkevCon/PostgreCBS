@@ -47,7 +47,7 @@ jobs:
           id: diff
           run: |
             git fetch origin main
-            git diff --name-only FETCH_HEAD HEAD -- DDL/*.sql | tee diff_files.txt
+            git diff --name-only HEAD^ HEAD -- DDL/*.sql | tee diff_files.txt
             echo "Contents of diff_files.txt:"
             cat diff_files.txt
             diff_files=$(cat diff_files.txt | tr '\n' ' ')
