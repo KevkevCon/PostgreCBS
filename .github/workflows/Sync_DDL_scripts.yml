@@ -69,7 +69,7 @@ jobs:
             fi
     
         - name: Sync with Database
-          if: ${{ steps.diff.outputs.diff_files != '' }}
+          if: ${{ steps.diff.outputs.diff_files }}
           env:
             PGHOST: ${{ secrets.CBS_HOST }}
             PGPORT: ${{ secrets.CBS_PORT }}
