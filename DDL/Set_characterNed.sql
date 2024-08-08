@@ -19,8 +19,7 @@ BEGIN
                 Shool Character varying,
                 Groep Integer,
                 Meester Character varying,
-                afgeronde_Missies integer,
-                "Atribute_1" Character varying
+                afgeronde_Missies integer
 
             
           );

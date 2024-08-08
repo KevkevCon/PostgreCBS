@@ -78,16 +78,15 @@ jobs:
             PGDATABASE: ${{ secrets.CBS_DBNAME }}
           run: |
             set -e  # Exit on error
-            cd DDL
             for file in ${{ env.diff_files }}; do
+              echo "Processing $file"
               table_name=$(basename "$file" .sql)
-              echo "Processing $table_name"
-              
+                
               if psql -c "\dt" | grep -q "$table_name"; then
                 echo "Table $table_name exists, dropping it"
                 psql -c "DROP TABLE IF EXISTS $table_name"
               fi
-              
+                
               echo "Running script $file"
               psql -f "$file"
             done

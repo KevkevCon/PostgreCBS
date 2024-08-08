@@ -18,7 +18,6 @@ BEGIN
                 Gender Character varying,
                 "Group" Integer,
 		        Mastery character varying,	
-                test boolean,
 			 	Grand_Master boolean
 
  

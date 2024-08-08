@@ -18,7 +18,6 @@ BEGIN
                 Gender Character varying,
                 Shool Character varying,
                 "Group" Integer,
-                Sensei Character varying,
                 Missions_completed integer,
                 Misions integer,
                 "Level" integer,
