@@ -37,6 +37,11 @@ jobs:
             git fetch origin main
             git log --oneline
           shell: bash
+        - name: List all files in DDL directory
+          run: |
+            echo "Listing all files in DDL directory:"
+            find DDL -type f -name "*.sql"
+          shell: bash
 
         - name: Identify modified or new SQL scripts
           id: diff
