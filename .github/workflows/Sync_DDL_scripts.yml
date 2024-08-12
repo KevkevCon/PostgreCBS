@@ -32,17 +32,18 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y postgresql-client
 
-        - name: Verify Git Fetch
-          run: |
-            git fetch origin main
-            git log --oneline
+            - name: Verify Git Fetch
+            run: |
+              git fetch --all
+              git log --oneline
           shell: bash
+      
         - name: List all files in DDL directory
           run: |
             echo "Listing all files in DDL directory:"
             find DDL -type f -name "*.sql"
           shell: bash
-    
+      
         - name: Identify modified or new SQL scripts
           id: diff
           run: |
@@ -54,11 +55,11 @@ jobs:
             echo "diff_files=$diff_files" >> $GITHUB_ENV
             echo "Identified modified or new SQL scripts: $diff_files"
           shell: bash
-    
+      
         - name: List modified or new SQL scripts
           run: |
             echo "Modified or new SQL scripts: ${{ env.diff_files }}"
-    
+      
         - name: Debug diff_files variable
           run: |
             echo "Debug: diff_files = ${{ env.diff_files }}"
@@ -67,7 +68,7 @@ jobs:
             else
               echo "Files to process: ${{ env.diff_files }}"
             fi
-    
+      
         - name: Sync with Database
           if: ${{ env.diff_files != '' }}
           env:
@@ -82,7 +83,6 @@ jobs:
               echo "Processing $file"
               table_name=$(basename "$file" .sql)
                 
-               
               extracted_table_name=$(grep -i 'create table' $file | awk '{print $3}' | tr -d '"')
                 
               if [ -n "$extracted_table_name" ]; then
@@ -97,4 +97,3 @@ jobs:
               psql -f "$file"
             done
           shell: bash
-        
