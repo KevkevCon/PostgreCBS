@@ -31,11 +31,11 @@ jobs:
           run: |
             sudo apt-get update
             sudo apt-get install -y postgresql-client
-
+      
         - name: Verify Git Fetch
           run: |
-              git fetch --all
-              git log --oneline
+            git fetch --all
+            git log --oneline
           shell: bash
       
         - name: List all files in DDL directory
@@ -81,15 +81,15 @@ jobs:
             set -e  # Exit on error
             for file in ${{ env.diff_files }}; do
               echo "Processing $file"
-              table_name=$(basename "$file" .sql)
                 
-              extracted_table_name=$(grep -i 'create table' $file | awk '{print $3}' | tr -d '"')
                 
-              if [ -n "$extracted_table_name" ]; then
-                echo "Dropping table $extracted_table_name if it exists"
-                psql -c "DROP TABLE IF EXISTS $extracted_table_name"
+              table_name=$(sed -n -e '/CREATE TABLE IF NOT EXISTS/{s/.*CREATE TABLE IF NOT EXISTS *\([^.]*\).*/\1/p}' "$file")
+                
+              if [ -n "$table_name" ]; then
+                echo "Dropping table $table_name if it exists"
+                psql -c "DROP TABLE IF EXISTS $table_name CASCADE"
               else
-                echo "No table creation statement found in $file"
+                echo "Could not extract table name from $file"
                 exit 1
               fi
                 
