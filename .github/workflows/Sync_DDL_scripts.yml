@@ -82,23 +82,12 @@ jobs:
             for file in ${{ env.diff_files }}; do
               echo "Processing $file"
           
-            
-              schema_name=$(echo "$file" | sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^.]*\)\..*/\1/p')
-              table_name=$(echo "$file" | sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *[^.]*\.\(.*\)/\1/p')
-
-              if [[ -z "$schema_name" ]]; then
-                
-                full_table_name=$(echo "$table_name" | sed -e 's/\"//g') # Remove any existing quotes
-                formatted_table_name="\"$full_table_name\""
-              else
-                
-                full_table_name=$(echo "$schema_name.$table_name" | sed -e 's/\"//g') # Remove any existing quotes
-                formatted_table_name="\"$(echo $schema_name)\".\"$(echo $table_name)\""
-              fi
-
-              if [ -n "$formatted_table_name" ]; then
-                  echo "Dropping table $formatted_table_name if it exists"
-                  psql -c "DROP TABLE IF EXISTS $formatted_table_name CASCADE"
+              # Extract the full table name directly, including schema if present
+              full_table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS \([^ ]*\).*/\1/p' "$file")
+          
+              if [ -n "$full_table_name" ]; then
+                  echo "Dropping table \"$full_table_name\" if it exists"
+                  psql -c "DROP TABLE IF EXISTS $full_table_name CASCADE"
               else
                   echo "Could not extract table name from $file"
                   exit 1
