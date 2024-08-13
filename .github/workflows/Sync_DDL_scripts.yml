@@ -82,17 +82,18 @@ jobs:
             for file in ${{ env.diff_files }}; do
               echo "Processing $file"
           
-              
-              
-              full_table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
+            
+              schema_name=$(echo "$file" | sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^.]*\)\..*/\1/p')
+              table_name=$(echo "$file" | sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *[^.]*\.\(.*\)/\1/p')
 
-              
-              if [[ $full_table_name == *'"'* ]]; then
-  
-                formatted_table_name=$(echo "$full_table_name" | sed -e 's/\([^.]*\)\.\(.*\)/\1."\"\2/')
+              if [[ -z "$schema_name" ]]; then
+                
+                full_table_name=$(echo "$table_name" | sed -e 's/\"//g') # Remove any existing quotes
+                formatted_table_name="\"$full_table_name\""
               else
- 
-                formatted_table_name=$(echo "$full_table_name" | sed -e 's/\./\".\"/g')
+                
+                full_table_name=$(echo "$schema_name.$table_name" | sed -e 's/\"//g') # Remove any existing quotes
+                formatted_table_name="\"$(echo $schema_name)\".\"$(echo $table_name)\""
               fi
 
               if [ -n "$formatted_table_name" ]; then
@@ -102,6 +103,7 @@ jobs:
                   echo "Could not extract table name from $file"
                   exit 1
               fi
+          
               echo "Running script $file"
               psql -f "$file"
             done
