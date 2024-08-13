@@ -82,12 +82,15 @@ jobs:
             for file in ${{ env.diff_files }}; do
               echo "Processing $file"
           
-             
-              table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
+              
+              full_table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
           
-              if [ -n "$table_name" ]; then
-                echo "Dropping table \"$table_name\" if it exists"
-                psql -c "DROP TABLE IF EXISTS \"$table_name\" CASCADE"
+              
+              formatted_table_name=$(echo "$full_table_name" | sed -e 's/\./\".\"/g' -e 's/^/\"/' -e 's/$/\"/')
+          
+              if [ -n "$formatted_table_name" ]; then
+                echo "Dropping table $formatted_table_name if it exists"
+                psql -c "DROP TABLE IF EXISTS $formatted_table_name CASCADE"
               else
                 echo "Could not extract table name from $file"
                 exit 1
