@@ -19,11 +19,11 @@ jobs:
 
     - name: Log commit information to PostgreSQL
       env:
-        PGHOST: ${{ secrets.PGHOST }}
-        PGPORT: ${{ secrets.PGPORT }}
-        PGUSER: ${{ secrets.PGUSER }}
-        PGPASSWORD: ${{ secrets.PGPASSWORD }}
-        PGDATABASE: ${{ secrets.PGDATABASE }}
+        PGHOST: ${{ secrets.CBS_HOST }}
+        PGPORT: ${{ secrets.CBS_PORT }}
+        PGUSER: ${{ secrets.CBS_USERNAME }}
+        PGPASSWORD: ${{ secrets.CBS_WW }}
+        PGDATABASE: ${{ secrets.CBS_DBNAME }}
         COMMIT_ID: ${{ github.sha }}
         AUTHOR_NAME: ${{ github.actor }}
         AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
