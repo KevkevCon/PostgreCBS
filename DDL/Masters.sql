@@ -14,7 +14,7 @@ BEGIN
           (
                 FirstName Character varying,
                 LastName Character varying,
-                "D.O.B 2" Date,
+                "D.O.B 33" Date,
                 Gender Character varying,
                 "Group" Integer,
 		        Mastery character varying,	
