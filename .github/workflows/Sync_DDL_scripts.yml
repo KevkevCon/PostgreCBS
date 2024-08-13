@@ -90,7 +90,7 @@ jobs:
               if [ -n "$formatted_table_name" ]; then
                 echo "Dropping table $formatted_table_name if it exists"
                 
-                psql -c "DROP TABLE IF EXISTS \"$formatted_table_name\" CASCADE"
+                psql -c "DROP TABLE IF EXISTS \ $formatted_table_name\" CASCADE"
               else
                 echo "Could not extract table name from $file"
                 exit 1
