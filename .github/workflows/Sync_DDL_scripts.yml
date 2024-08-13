@@ -86,7 +86,7 @@ jobs:
               table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
           
               if [ -n "$table_name" ]; then
-                echo "Dropping table $table_name if it exists"
+                echo "Dropping table \"$table_name\" if it exists"
                 psql -c "DROP TABLE IF EXISTS \"$table_name\" CASCADE"
               else
                 echo "Could not extract table name from $file"
