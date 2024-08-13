@@ -19,7 +19,7 @@ BEGIN
                 Tester_name Character varying,
                 "Start_date" Date,
                 "End_date" Date,
-                "test5Due_Date" Character varying
+                "test6Due_Date" Character varying
 
  
             
