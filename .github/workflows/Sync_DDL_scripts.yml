@@ -80,20 +80,20 @@ jobs:
           run: |
             set -e  # Exit on error
             for file in ${{ env.diff_files }}; do
-              echo "Processing $file"
-                
-                
-              table_name=$(sed -n -e '/CREATE TABLE IF NOT EXISTS/{s/.*CREATE TABLE IF NOT EXISTS *\([^.]*\).*/\1/p}' "$file")
-                
-              if [ -n "$table_name" ]; then
-                echo "Dropping table $table_name if it exists"
-                psql -c "DROP TABLE IF EXISTS $table_name CASCADE"
-              else
-                echo "Could not extract table name from $file"
-                exit 1
-              fi
-                
-              echo "Running script $file"
-              psql -f "$file"
+            echo "Processing $file"
+          
+            # Extract full table name including schema
+            table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file" | tr -d '\"')
+          
+            if [ -n "$table_name" ]; then
+              echo "Dropping table $table_name if it exists"
+              psql -c "DROP TABLE IF EXISTS $table_name CASCADE"
+            else
+              echo "Could not extract table name from $file"
+              exit 1
+            fi
+          
+            echo "Running script $file"
+            psql -f "$file"
             done
           shell: bash
