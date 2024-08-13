@@ -83,20 +83,23 @@ jobs:
               echo "Processing $file"
           
               
-              full_table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
-          
               
-              formatted_table_name=$(echo $full_table_name | sed -e 's/\./\".\"/g')
-              if [ -n "$formatted_table_name" ]; then
-                echo "Dropping table $formatted_table_name if it exists"
-                
-                psql -c "DROP TABLE IF EXISTS \"$formatted_table_name\" CASCADE"
+              full_table_name=$(sed -n -e 's/.*CREATE TABLE IF NOT EXISTS *\([^ ]*\).*/\1/p' "$file")
+
+              
+              if [[ $full_table_name == *'"'* ]]; then
+  
+                formatted_table_name=$(echo "$full_table_name" | sed -e 's/\([^.]*\)\.\(.*\)/\1."\"\2/')
               else
-                echo "Could not extract table name from $file"
-                exit 1
+ 
+                formatted_table_name=$(echo "$full_table_name" | sed -e 's/\./\".\"/g')
               fi
-          
-              echo "Running script $file"
-              psql -f "$file"
-            done
+
+                if [ -n "$formatted_table_name" ]; then
+                    echo "Dropping table $formatted_table_name if it exists"
+                    psql -c "DROP TABLE IF EXISTS $formatted_table_name CASCADE"
+                else
+                    echo "Could not extract table name from $file"
+                    exit 1
+                fi
           shell: bash
