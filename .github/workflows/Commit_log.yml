@@ -31,4 +31,4 @@ jobs:
         COMMITTED_AT: ${{ github.event.head_commit.timestamp }}
       run: |
         psql -c "INSERT INTO raw.commit_logs (commit_id, author_name, author_email, branch_name, commit_message, committed_at)
-                 VALUES ('$COMMIT_ID', '$AUTHOR_NAME', '$BRANCH_NAME', '$COMMIT_MESSAGE', '$COMMITTED_AT');"
+                 VALUES ('<commit_id>', '<author_name>', '<author_email>', '<branch_name>', '<commit_message>', '<committed_at>');
