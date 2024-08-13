@@ -12,14 +12,16 @@ BEGIN
 
           CREATE TABLE IF NOT EXISTS raw."Set_characterNed"
           (
-                EersteNaam Character varying,
-                TweedeNaam Character varying,
+                Naam Character varying,
+                Fam_naam Character varying,
+                Mid_naam character varying,
                 Geboortedag Date,
                 Gender Character varying,
                 Shool Character varying,
                 Groep Integer,
                 Meester Character varying,
                 afgeronde_Missies integer
+
 
             
           );
