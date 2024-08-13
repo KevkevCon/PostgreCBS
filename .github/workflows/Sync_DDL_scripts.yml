@@ -102,4 +102,7 @@ jobs:
                   echo "Could not extract table name from $file"
                   exit 1
               fi
+              echo "Running script $file"
+              psql -f "$file"
+            done
           shell: bash
